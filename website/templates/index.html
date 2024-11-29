@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}My Top Movies{% endblock %}
+
+{% block heading %}My Top Movies{% endblock %}
+
+{% block paragraph %}These are my all movies I have ever watched.{% endblock %}
+
+{% block top_10_content %}
+<div class="card card-top-10" >
+    <div class="front" style="background-image: url('https://www.shortlist.com/media/images/2019/05/the-30-coolest-alternative-movie-posters-ever-2-1556670563-K61a-column-width-inline.jpg');">
+        <p class="large">1</p>
+    </div>
+    <div class="back">
+      <div>
+    <div class="title">Drive <span class="release_date">(2011)</span></div>
+        <div class="rating">
+            <label>7.5</label>
+          <i class="fas fa-star star"></i>
+        </div>
+          <p class="review">"Loved it!"</p>
+        <p class="overview">
+            A mysterious Hollywood stuntman and mechanic moonlights as a getaway driver and finds himself in trouble when he helps out his neighbor in this action drama.
+        </p>
+        <a href="{{url_for('routes.edit')}}" class="button">Update</a>
+        <a href="#" class="button delete-button">Delete</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block all_content %}
+<div class="row row-cols-4 row-cols-sm-5 row-cols-md-6 gap-3">
+  <div class="movie-container px-0 mx-0">
+    <img src="https://www.shortlist.com/media/images/2019/05/the-30-coolest-alternative-movie-posters-ever-2-1556670563-K61a-column-width-inline.jpg" alt="movie">
+    <div class="content-body">
+      <div class="title">Drive <span class="release_date">(2011)</span></div>
+        <div class="rating">
+            <label>7.5</label>
+          <i class="fas fa-star star"></i>
+        </div>
+          <p class="review">"Loved it!"</p>
+    </div>
+  </div>
+</div>  
+{% endblock %}
