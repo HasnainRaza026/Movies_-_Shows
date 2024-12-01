@@ -9,26 +9,26 @@
 
 {% block content %}
 <div class="container">
-    <form method="POST" action="{{url_for('routes.edit')}}" novalidate class="needs-validation">
+    <form method="POST" action="{{url_for('views.edit')}}" novalidate class="needs-validation">
     {{ form.hidden_tag() }}
     
     <div class="form-group mb-3">
-        {{ form.my_review.label(class="fw-bold mb-1") }}
-        {{ form.my_review(class="form-control form-control-sm w-50") }}
-        {% for error in form.my_review.errors %}
+        {{ form.review.label(class="fw-bold mb-1") }}
+        {{ form.review(class="form-control form-control-sm w-50") }}
+        {% for error in form.review.errors %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
     </div>
 
     <div class="form-group mb-3">
-        {{ form.edit_ranking.label(class="fw-bold mb-1") }}
-        {{ form.edit_ranking(class="form-control form-control-sm w-50") }}
-        {% for error in form.edit_ranking.errors %}
+        {{ form.ranking.label(class="fw-bold mb-1") }}
+        {{ form.ranking(class="form-control form-control-sm w-50") }}
+        {% for error in form.ranking.errors %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
     </div>  
 
-    {{ form.submit(class="btn btn-lg btn-success mt-3") }}
+    {{ form.edit(class="btn btn-lg btn-success mt-3") }}
     </form>
 </div>
 {% endblock %}

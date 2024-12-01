@@ -1,16 +1,42 @@
-
-
-{% block styles %}
-  {{ super() }}
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,700">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,700">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-{% endblock %}
+{% extends "base.html" %}
 
 {% block title %}Add Movie{% endblock %}
 
+{% block heading %}Add Movie{% endblock %}
+
+{% block paragraph %}Add your favourite movie to the collection{% endblock %}
+
+
 {% block content %}
-<div class="content">
-    <h1 class="heading">Add a Movie</h1>
+<div class="container">
+    <form method="POST" action="{{url_for('views.add')}}" novalidate class="needs-validation">
+    {{ form.hidden_tag() }}
+    
+    <div class="form-group mb-3">
+        {{ form.title.label(class="fw-bold mb-1") }}
+        {{ form.title(class="form-control form-control-sm w-50") }}
+        {% for error in form.title.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group mb-3">
+        {{ form.review.label(class="fw-bold mb-1") }}
+        {{ form.review(class="form-control form-control-sm w-50") }}
+        {% for error in form.review.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group mb-3">
+        {{ form.ranking.label(class="fw-bold mb-1") }}
+        {{ form.ranking(class="form-control form-control-sm w-50") }}
+        {% for error in form.ranking.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>  
+
+    {{ form.add(class="btn btn-lg btn-success mt-3") }}
+    </form>
 </div>
 {% endblock %}

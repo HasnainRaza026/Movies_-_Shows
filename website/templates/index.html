@@ -4,7 +4,7 @@
 
 {% block heading %}My Top Movies{% endblock %}
 
-{% block paragraph %}These are my all movies I have ever watched.{% endblock %}
+{% block paragraph %}These are my all the movies I have ever watched.{% endblock %}
 
 {% block top_10_content %}
 <div class="card card-top-10" >
@@ -22,7 +22,7 @@
         <p class="overview">
             A mysterious Hollywood stuntman and mechanic moonlights as a getaway driver and finds himself in trouble when he helps out his neighbor in this action drama.
         </p>
-        <a href="{{url_for('routes.edit')}}" class="button">Update</a>
+        <a href="{{url_for('views.edit')}}" class="button">Update</a>
         <a href="#" class="button delete-button">Delete</a>
       </div>
     </div>
