@@ -3,13 +3,13 @@
 
 {% block title %}Edit Movies{% endblock %}
 
-{% block heading %}Movie Name{% endblock %}
+{% block heading %}{{movie.title}}{% endblock %}
 
-{% block paragraph %}Edit Movie Rating{% endblock %}
+{% block paragraph %}Yor can edit the Rank, Review or both of the movie '{{movie.titles}}'{% endblock %}
 
 {% block content %}
 <div class="container">
-    <form method="POST" action="{{url_for('views.edit')}}" novalidate class="needs-validation">
+    <form method="POST" action="{{url_for('views.edit', id=movie['id'])}}" novalidate class="needs-validation">
     {{ form.hidden_tag() }}
     
     <div class="form-group mb-3">
@@ -29,6 +29,8 @@
     </div>  
 
     {{ form.edit(class="btn btn-lg btn-success mt-3") }}
+    <a href="{{ url_for('views.home') }}" class="btn btn-lg btn-secondary">Back</a>
     </form>
+    
 </div>
 {% endblock %}

@@ -17,6 +17,6 @@ class All_Movies(db.Model):
     year = db.Column(db.Integer, nullable=False)
     rating = db.Column(db.Float, nullable=False)
     review = db.Column(db.String(20), nullable=False)
-    img_url = db.Column(db.String(1000), unique=True, nullable=False)
+    img_url = db.Column(db.String(1000), unique=True, nullable=False) 
 
     

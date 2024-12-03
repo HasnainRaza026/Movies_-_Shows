@@ -1,46 +1,78 @@
 {% extends "base.html" %}
 
-{% block title %}My Top Movies{% endblock %}
+{% block title %}My Favourite Movies{% endblock %}
 
-{% block heading %}My Top Movies{% endblock %}
+{% block heading %}My Favourite Movies{% endblock %}
 
 {% block paragraph %}These are my all the movies I have ever watched.{% endblock %}
 
-{% block top_10_content %}
-<div class="card card-top-10" >
-    <div class="front" style="background-image: url('https://www.shortlist.com/media/images/2019/05/the-30-coolest-alternative-movie-posters-ever-2-1556670563-K61a-column-width-inline.jpg');">
-        <p class="large">1</p>
-    </div>
-    <div class="back">
-      <div>
-    <div class="title">Drive <span class="release_date">(2011)</span></div>
-        <div class="rating">
-            <label>7.5</label>
-          <i class="fas fa-star star"></i>
+{% block content %}
+  {% if not top_10_movies and not all_movies %}
+  <div class="container text-center">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-template">
+                <h1>
+                    Empty!</h1>
+                <h2>
+                    Nothing to show</h2>
+                <div class="error-details">
+                    Click Add Movies to add your favourite movies
+                </div>
+            </div>
         </div>
-          <p class="review">"Loved it!"</p>
-        <p class="overview">
-            A mysterious Hollywood stuntman and mechanic moonlights as a getaway driver and finds himself in trouble when he helps out his neighbor in this action drama.
-        </p>
-        <a href="{{url_for('views.edit')}}" class="button">Update</a>
-        <a href="#" class="button delete-button">Delete</a>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="container">
+    {% for movie in top_10_movies %}
+    <div class="card card-top-10" >
+      <div class="front" style="background-image: url('{{movie['img_url']}}');">
+          <p class="large">{{movie["rank"]}}</p>
+      </div>
+      <div class="back">
+        <div>
+      <div class="title">{{movie["title"]}} <span class="release_date">({{movie["year"]}})</span></div>
+          <div class="rating">
+              <label>{{movie["rating"]}}</label>
+            <i class="fas fa-star star"></i>
+          </div>
+            <p class="review">"{{movie["review"]}}"</p>
+          <p class="overview">
+            {{movie["description"]}}
+          </p>
+          <a href="{{url_for('views.edit', id=movie['id'])}}" class="button">Update</a>
+          <a href="{{url_for('views.delete', id=movie['id'])}}" class="button delete-button">Remove</a>
+        </div>
       </div>
     </div>
+    {% endfor %}
   </div>
-{% endblock %}
-
-{% block all_content %}
-<div class="row row-cols-4 row-cols-sm-5 row-cols-md-6 gap-3">
-  <div class="movie-container px-0 mx-0">
-    <img src="https://www.shortlist.com/media/images/2019/05/the-30-coolest-alternative-movie-posters-ever-2-1556670563-K61a-column-width-inline.jpg" alt="movie">
-    <div class="content-body">
-      <div class="title">Drive <span class="release_date">(2011)</span></div>
-        <div class="rating">
-            <label>7.5</label>
-          <i class="fas fa-star star"></i>
+  
+  <div class="container text-center">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+        {% for movie in all_movies %}
+        <div class="col">
+            <div class="movie-container px-0 mx-0">
+                <img src="{{movie['img_url']}}" alt="{{movie['title']}}" class="img-fluid">
+                <div class="content-body">
+                    <div class="title">{{movie["title"]}} <span class="release_date">({{movie["year"]}})</span></div>
+                    <div class="rating">
+                        <label>{{movie["rating"]}}</label>
+                        <i class="fas fa-star star"></i>
+                    </div>
+                    <p class="review">"{{movie["review"]}}"</p>
+                </div>
+            </div>
         </div>
-          <p class="review">"Loved it!"</p>
+        {% endfor %}
     </div>
   </div>
-</div>  
+ 
+  {% endif %}
+
+  <div class="container text-center add custom-css-add-botton">
+    <a href="{{url_for('views.add')}}" class="button">Add Movie</a>
+  </div>
 {% endblock %}

@@ -15,27 +15,38 @@
 
 
 <body>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+      {% for category, message in messages %}
+        {% if category == 'error' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% else %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endif %}
+      {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% block body %}
 <div class="container pt-3">
   <h1 class="heading">{% block heading %}{% endblock %}</h1>
   <p class="description">{% block paragraph %}{% endblock %}</p>
 </div>
 
 {% block content %}
-<div class="container">
-  {% block top_10_content %}
-  
-  {% endblock %}
-</div>
 
-<div class="container text-center">
-  {% block all_content %}
-  
-  {% endblock %}
-</div>
+{% endblock %}
 
-<div class="container text-center add custom-css-add-botton">
-<a href="{{url_for('views.add')}}" class="button">Add Movie</a>
-</div>
 {% endblock %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
