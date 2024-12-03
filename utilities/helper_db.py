@@ -6,6 +6,12 @@ from .logger import logger
 def Add(form):
     try:
         if form.ranking.data:
+            # Check if there are already 10 movies in Top_10_Movies
+            top_10_count = Top_10_Movies.query.count()
+            if top_10_count >= 10:
+                logger.warning("Top_10_Movies table already has 10 entries. Cannot add more.")
+                return "TOP_10_FULL"
+
             movie = Top_10_Movies(
                 title=form.title.data, year=2000, description="sample description", rating=7.8, 
                 rank=form.ranking.data, review=form.review.data, img_url="https://image.tmdb.org/t/p/w500/tjrX2oWRCM3Tvarz38zlZM7Uc10.jpg"
@@ -21,22 +27,20 @@ def Add(form):
         db.session.commit()
 
         logger.info(f"Successfully added Movie: {form.title.data} (Rank: {form.ranking.data if form.ranking.data else 'N/A'}) to the Database")
-        return True
+        return "SUCCESS"
 
     except SQLAlchemyError as db_error:
-        # Handle SQLAlchemy-related errors (e.g., database connectivity, integrity constraints)
         logger.error(f"Database error while adding Movie '{form.title.data}': {db_error}")
-        db.session.rollback()  # Rollback in case of an error
+        db.session.rollback()
     except AttributeError as attr_err:
-        # Handle case where the movie object doesn't have the expected attributes
         logger.error(f"AttributeError while adding Movie ('{form.title.data}'): {attr_err}")
         db.session.rollback()
     except Exception as error:
-        # Catch any other unexpected errors
         logger.error(f"Unexpected error while adding Movie '{form.title.data}': {error}")
         db.session.rollback()
 
-    return False
+    return "ERROR"
+
 
 
 def Get_All():

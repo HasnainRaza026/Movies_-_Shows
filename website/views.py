@@ -10,7 +10,7 @@ views = Blueprint('views', __name__)
 @views.route("/")
 def home():
     data = helper_db.Get_All()
-    if not data or not data[0] or not data[1]:  # Check if both lists have data
+    if not data[0] and not data[1]:  # Check if both lists have data
         flash("No movies available. Please try again later.", category="warning")
         return render_template("error.html")
 
@@ -26,13 +26,16 @@ def add():
     if add_form.validate_on_submit():
         status = helper_db.Add(add_form)
 
-        if status:
+        if status == "SUCCESS":
             flash(message="Movie added successfully!", category="success")
             return redirect(url_for('views.home'))
+        elif status == "TOP_10_FULL":
+            flash(message="Cannot add more movies to the Top 10 list. It is already full.", category="warning")
         else:
             flash(message="Internal Server Error in Adding Movie to the Database", category="error")
 
     return render_template('add.html', form=add_form)
+
 
 
 
