@@ -1,7 +1,7 @@
 from flask import Blueprint, flash
 from flask import Flask, render_template, redirect, url_for, request
 from .forms import EditMovie, AddMovie
-from utilities import helper_db
+from utilities import helper_db, helper_api
 
 views = Blueprint('views', __name__)
 
@@ -24,19 +24,23 @@ def add():
     add_form = AddMovie()
 
     if add_form.validate_on_submit():
-        status = helper_db.Add(add_form)
-
+        # Call the movie search API
+        data = helper_api.SEARCH_MOVIE(add_form.title.data)
+        if "error" in data:
+            flash(data["error"], category="error")
+            return render_template('add.html', form=add_form)
+        
+        # Add movie to the database
+        status = helper_db.Add(form=add_form, data=data)
         if status == "SUCCESS":
-            flash(message="Movie added successfully!", category="success")
+            flash("Movie added successfully!", category="success")
             return redirect(url_for('views.home'))
         elif status == "TOP_10_FULL":
-            flash(message="Cannot add more movies to the Top 10 list. It is already full.", category="warning")
+            flash("Cannot add more movies to the Top 10 list. It is already full.", category="warning")
         else:
-            flash(message="Internal Server Error in Adding Movie to the Database", category="error")
-
+            flash("Internal Server Error in Adding Movie to the Database", category="error")
+    
     return render_template('add.html', form=add_form)
-
-
 
 
 
