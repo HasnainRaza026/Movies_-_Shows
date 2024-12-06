@@ -17,20 +17,20 @@ def Add(form, data):
             # Adjust rankings if necessary
             existing_movie = Top_10_Movies.query.filter_by(rank=form.ranking.data).first()
             if existing_movie:
-                # Temporarily shift ranks to avoid conflicts
+                # Temporarily shift ranks to avoid UNIQUE constraint violations
                 movies_to_shift = Top_10_Movies.query.filter(
                     Top_10_Movies.rank >= form.ranking.data
                 ).order_by(Top_10_Movies.rank.desc()).all()
 
                 # Temporarily increase ranks
                 for movie in movies_to_shift:
-                    movie.rank += 10  # Temporarily shift ranks
+                    movie.rank += 10
 
                 db.session.flush()  # Apply temporary shifts
 
                 # Adjust ranks to the correct positions
                 for movie in movies_to_shift:
-                    movie.rank -= 9  # Shift back to the correct rank
+                    movie.rank -= 9
 
             # Create a new movie with the specified rank
             movie = Top_10_Movies(
@@ -141,24 +141,38 @@ def Edit(movie, column_name, data):
 
 
 
-def Delete(movie):
+def Delete(movie_to_delt):
     try:
-        db.session.delete(movie)
+        # Adjust rankings if the movie is in Top_10_Movies
+        if isinstance(movie_to_delt, Top_10_Movies):
+            movies_to_shift = Top_10_Movies.query.filter(
+                Top_10_Movies.rank > movie_to_delt.rank
+            ).order_by(Top_10_Movies.rank.asc()).all()
+
+            for movie in movies_to_shift:
+                movie.rank += 10
+
+            db.session.delete(movie_to_delt)
+
+            db.session.flush() 
+
+            for movie in movies_to_shift:
+                movie.rank -= 11
+
         db.session.flush()
         db.session.commit()
 
-        logger.info(f"Successfully deleted Movie ID {movie.id}: {movie.title}")
+        logger.info(f"Successfully deleted Movie ID {movie_to_delt.id}: {movie_to_delt.title}")
         return True
-    
+
     except SQLAlchemyError as db_error:
-        logger.error(f"Database error while deleting Movie ID {movie.id} ('{movie.title}'): {db_error}")
-        db.session.rollback
+        logger.error(f"Database error while deleting Movie ID {movie_to_delt.id} ('{movie_to_delt.title}'): {db_error}")
+        db.session.rollback()
     except AttributeError as attr_err:
-        logger.error(f"AttributeError while deleting Movie ID {movie.id} ('{movie.title}'): {attr_err}")
+        logger.error(f"AttributeError while deleting Movie ID {movie_to_delt.id} ('{movie_to_delt.title}'): {attr_err}")
         db.session.rollback()
     except Exception as error:
-        logger.error(f"Unexpected error while deleting Movie ID {movie.id} ('{movie.title}'): {error}")
+        logger.error(f"Unexpected error while deleting Movie ID {movie_to_delt.id} ('{movie_to_delt.title}'): {error}")
         db.session.rollback()
 
     return False
-
