@@ -5,8 +5,6 @@ from utilities import helper_db, helper_api
 
 views = Blueprint('views', __name__)
 
-
-
 @views.route("/")
 def home():
     data = helper_db.Get_All()

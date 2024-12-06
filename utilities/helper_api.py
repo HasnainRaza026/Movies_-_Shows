@@ -1,8 +1,7 @@
 import requests
-import os
 from .logger import logger
+from website import API_KEY
 
-API_KEY = os.getenv('API_KEY')
 base_url = "https://api.themoviedb.org/3"
 
 def SEARCH_MOVIE(movie_name):

@@ -253,6 +253,11 @@
 	transform: translateX(-50%); /* Adjust for element's width to truly center */
 	z-index: 1000;
   }
+
+#suggestions li:hover {
+	background-color: #f0f0f0;
+	cursor: pointer;
+}
   
 .error-template {padding: 40px 15px;text-align: center;}
 .error-actions {margin-top:15px;margin-bottom:15px;}

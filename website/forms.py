@@ -3,9 +3,9 @@ from wtforms import StringField, PasswordField, IntegerField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, NumberRange, Optional
 
 class AddMovie(FlaskForm):
-    title = StringField('Movie Title', validators=[DataRequired(message="Movie Title is required."), Length(max=120)])
-    review = StringField('Your Review', validators=[DataRequired(message="Review is required."), Length(max=20)])
-    ranking = IntegerField('Add Ranking 1-10 (Optional)', validators=[Optional(), NumberRange(min=1, max=10)])
+    title = StringField('Type movie name', validators=[DataRequired(message="Movie Title is required."), Length(max=120)])
+    review = StringField('Give your review', validators=[DataRequired(message="Review is required."), Length(max=20)])
+    ranking = IntegerField('Add your ranking 1-10 (Optional)', validators=[Optional(), NumberRange(min=1, max=10)])
     add = SubmitField('Add')
 
 class EditMovie(FlaskForm):
