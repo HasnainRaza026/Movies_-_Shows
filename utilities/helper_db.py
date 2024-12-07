@@ -40,7 +40,8 @@ def Add(form, data):
                 rating=data.get("rating"),
                 rank=form.ranking.data,
                 review=form.review.data,
-                img_url=data.get("poster")
+                img_url=data.get("poster"),
+                movie_id=data.get("movie_id")
             )
         else:
             # Adding to All_Movies table
@@ -49,7 +50,8 @@ def Add(form, data):
                 year=data.get("year"),
                 rating=data.get("rating"),
                 review=form.review.data,
-                img_url=data.get("poster")
+                img_url=data.get("poster"),
+                movie_id=data.get("movie_id")
             )
 
         db.session.add(movie)

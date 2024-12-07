@@ -4,37 +4,41 @@ from website import API_KEY
 
 BASE_URL = "https://api.themoviedb.org/3"
 
-def SEARCH_MOVIE(movie_name):
-    search_url = f"{BASE_URL}/search/movie"
-    params = {"api_key": API_KEY, "query": movie_name}
+def SEARCH_MOVIE(movie_id):
+    search_url = f"{BASE_URL}/movie/{movie_id}"  # Use the movie endpoint with the ID
+    params = {"api_key": API_KEY}
 
     try:
         response = requests.get(search_url, params=params)
         response.raise_for_status()  # Raise an HTTPError for bad responses
-        results = response.json().get("results", [])
         
-        if not results:
-            logger.warning(f"No results found for movie: {movie_name}")
-            return {"error": "No results found"}
+        # The response is the movie details, no `results` key
+        movie_data = response.json()
         
-        # Process the first result
-        first_result = results[0]
         return {
-            "title": first_result.get("title", "Unknown Title"),
-            "rating": first_result.get("vote_average", "N/A"),
-            "poster": f"https://image.tmdb.org/t/p/w500{first_result.get('poster_path')}" 
-                      if first_result.get("poster_path") else None,
-            "description": first_result.get("overview", "No description available."),
-            "year": first_result.get("release_date", "N/A").split("-")[0] if first_result.get("release_date") else "N/A"
+            "title": movie_data.get("title", "Unknown Title"),
+            "rating": movie_data.get("vote_average", "N/A"),
+            "poster": f"https://image.tmdb.org/t/p/w500{movie_data.get('poster_path')}" 
+                      if movie_data.get("poster_path") else None,
+            "description": movie_data.get("overview", "No description available."),
+            "year": movie_data.get("release_date", "N/A").split("-")[0] if movie_data.get("release_date") else "N/A"
         }
 
+    except requests.exceptions.HTTPError as http_error:
+        if response.status_code == 404:
+            logger.warning(f"No movie found for id: {movie_id}")
+            return {"error": "Movie not found"}
+        else:
+            logger.error(f"HTTP error occurred for movie with id: {movie_id}, error: {http_error}")
+            return {"error": "Failed to fetch movie details. Please try again later."}
     except requests.exceptions.RequestException as req_error:
-        logger.error(f"API request failed for movie: {movie_name}, error: {req_error}")
+        logger.error(f"API request failed for movie with id: {movie_id}, error: {req_error}")
         return {"error": "Failed to connect to the movie database API. Please try again later."}
-    except KeyError as key_error:
-        logger.error(f"Unexpected data structure from API for movie: {movie_name}, error: {key_error}")
-        return {"error": "Unexpected API response. Please try again later."}
-    
+    except Exception as error:
+        logger.error(f"Unexpected error for movie with id: {movie_id}, error: {error}")
+        return {"error": "An unexpected error occurred. Please try again later."}
+
+
 
 def SUGGEST_MOVIES_OR_SHOWS(content_type, query):
     try:
@@ -54,6 +58,7 @@ def SUGGEST_MOVIES_OR_SHOWS(content_type, query):
                 "title": item.get("title") or item.get("name", "Unknown Title"),
                 "year": item.get("release_date") or item.get("first_air_date", "N/A")[:4],
                 "poster": f"https://image.tmdb.org/t/p/w200{item.get('poster_path')}" if item.get("poster_path") else None,
+                "movie_id": item.get("id")
             }
             results.append(result)
 
@@ -71,3 +76,4 @@ def SUGGEST_MOVIES_OR_SHOWS(content_type, query):
     except Exception as error:
         logger.error(f"Unexpected error in suggestions API | query: '{query}' | error: {error}")
         return {"error": "An unexpected error occurred. Please try again later."}
+    

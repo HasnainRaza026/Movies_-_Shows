@@ -1,5 +1,15 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+
+# Ignore environment-specific files
+*.env
+
+# Ignore virtual environments
 myvenv
-.env
-__pycache__
-instance
+
+# Ignore Database
+instance/
+
+# Ignore Project TODO list
 TODO

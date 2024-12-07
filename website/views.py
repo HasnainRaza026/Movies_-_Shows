@@ -22,13 +22,16 @@ def add():
     add_form = AddMovie()
 
     if add_form.validate_on_submit():
-        # Call the movie search API
-        data = helper_api.SEARCH_MOVIE(add_form.title.data)
+        # Extract only the movie ID from the input field
+        movie_id = add_form.title.data.split()[-1]  # Assumes the ID is the last part of the input
+        data = helper_api.SEARCH_MOVIE(movie_id)  # Send ID to the api call
+
         if "error" in data:
             flash(data["error"], category="error")
             return render_template('add.html', form=add_form)
         
         # Add movie to the database
+        data["movie_id"] = movie_id
         status = helper_db.Add(form=add_form, data=data)
         if status == "SUCCESS":
             flash("Movie added successfully!", category="success")

@@ -34,9 +34,9 @@ socket.on("search_results", function (data) {
 
             // Click event
             item.addEventListener("click", () => {
-                document.getElementById("movieInput").value = movie.title;
+                document.getElementById("movieInput").value = `${movie.title} ${movie.movie_id}`;
                 suggestions.style.display = "none";
-            });
+            });            
 
             item.appendChild(poster);
             item.appendChild(text);

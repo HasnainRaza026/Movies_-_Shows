@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_socketio import SocketIO
 from utilities.logger import logger
 
@@ -23,6 +24,9 @@ def create_app(config_class='config.Config'):
     # Initialize extensions
     db.init_app(app)
     socketio.init_app(app)
+
+    # Bind Flask-Migrate to the app and SQLAlchemy, used for db migrations
+    migrate = Migrate(app, db)
 
     # Register blueprints
     from .views import views
