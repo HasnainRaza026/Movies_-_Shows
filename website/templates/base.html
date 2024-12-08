@@ -50,11 +50,11 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top bg-light navbar-light">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="#">
+        <a class="navbar-brand d-flex align-items-center" href="{{url_for('views.home')}}">
             <img
-              id="MDB-logo"
+              id="watchlist"
               src="{{ url_for('static', filename='assets/logo.png') }}"
-              alt="MDB Logo"
+              alt="MyWatchList"
               draggable="false"
               height="30px"
               class="me-3"
@@ -74,12 +74,21 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto align-items-center">
+          {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#!">Home</a>
+            <a class="nav-link mx-2" href="{{url_for('views.home')}}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#!">Log</a>
+            <a class="nav-link mx-2" href="{{url_for('auth.logout')}}">Logout</a>
           </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link mx-2" href="{{url_for('auth.login')}}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link mx-2" href="{{url_for('auth.signup')}}">Signup</a>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>

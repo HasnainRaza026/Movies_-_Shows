@@ -1,11 +1,70 @@
 from sqlalchemy.exc import SQLAlchemyError
 from website import db
-from website.models import Top_10_Movies, All_Movies
+from website.models import Top_10_Movies, All_Movies, User
 from .logger import logger
 
 from sqlalchemy.exc import SQLAlchemyError
 
-def Add(form, data):
+
+#################################### USERS HELPER FUNCTIONS ##############################################
+
+def Add_User(data):
+    try:
+        # Check if user already exists
+        existing_user = User.query.filter_by(email=data["email"]).first()
+        if existing_user:
+            logger.warning(f"User with the email '{data['email']}' already exists.")
+            return "EXISTS", None
+
+        # Create a new user
+        new_user = User(
+            name=data["name"],
+            email=data["email"],
+            password=data["password"],
+        )
+
+        # Add to the database
+        db.session.add(new_user)
+        db.session.commit()
+
+        logger.info(f"Successfully added user: {data['name']} ({data['email']})")
+        return "SUCCESS", new_user
+
+    except SQLAlchemyError as db_error:
+        logger.error(f"Database error while adding user '{data['name']}' ({data['email']}): {db_error}")
+        db.session.rollback()
+
+    except Exception as error:
+        logger.error(f"Unexpected error while adding user '{data['name']}' ({data['email']}): {error}")
+        db.session.rollback()
+
+    return "ERROR", None
+
+
+
+def Get_User(email):
+    try:
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            logger.info("Successfully fetched user.")
+        else:
+            logger.warning("No user found with the provided email.")
+        return user
+    
+    except SQLAlchemyError as db_error:
+        logger.error("Database error while fetching user. Error: %s", db_error)
+        return None
+    except Exception as error:
+        logger.error("Unexpected error while fetching user. Error: %s", error)
+        return None
+
+
+
+
+#################################### MOVIES HELPER FUNCTIONS ##############################################
+
+def Add(form, data, user_id):
     try:
         if form.ranking.data:
             # Check if the Top_10_Movies table already has 10 entries
@@ -41,7 +100,8 @@ def Add(form, data):
                 rank=form.ranking.data,
                 review=form.review.data,
                 img_url=data.get("poster"),
-                movie_id=data.get("movie_id")
+                movie_id=data.get("movie_id"),
+                user_id=user_id
             )
         else:
             # Adding to All_Movies table
@@ -51,7 +111,8 @@ def Add(form, data):
                 rating=data.get("rating"),
                 review=form.review.data,
                 img_url=data.get("poster"),
-                movie_id=data.get("movie_id")
+                movie_id=data.get("movie_id"),
+                user_id=user_id
             )
 
         db.session.add(movie)
@@ -75,46 +136,55 @@ def Add(form, data):
 
 
 
-
-
-def Get_All():
+def Get_All(user_id):
     try:
-        top_10_movies = Top_10_Movies.query.order_by(Top_10_Movies.rank).all() # Query Top_10_Movies and order by rank
-        all_movies = All_Movies.query.all()  # Fetch all movies
+        top_10_movies = Top_10_Movies.query.filter_by(user_id=user_id).order_by(Top_10_Movies.rank).all() # Query Top_10_Movies and order by rank
+        all_movies = All_Movies.query.filter_by(user_id=user_id).all() 
 
-        logger.info(f"Fetched {len(top_10_movies)} top 10 movies and {len(all_movies)} all movies from the database.")
+        logger.info(f"Fetched {len(top_10_movies)} top 10 movies and {len(all_movies)} all movies for user ID {user_id}.")
         return (top_10_movies, all_movies)
     
     except SQLAlchemyError as db_error:
-        logger.error(f"Database error while fetching movies: {db_error}")
+        logger.error(f"Database error while fetching movies for user ID {user_id}: {db_error}")
         return ([], [])  # Return empty lists to prevent breaking the route
     except Exception as error:
-        logger.error(f"Unexpected error while fetching movies: {error}")
+        logger.error(f"Unexpected error while fetching movies for user ID {user_id}: {error}")
         return ([], [])  # Return empty lists in case of an error
 
 
 
-def Get(id, table=Top_10_Movies):
+def Get(id, user_id, table=Top_10_Movies):
     try:
-        movie = table.query.get(id)
+        if user_id:
+            movie = table.query.filter_by(id=id, user_id=user_id).first()  # Fetch movie with user_id filter, to ensure movie belongs to a user
+        else:
+            return "UNAUTHORIZED"
         
         if movie:
-            logger.info(f"Successfully fetched Movie with id={id} from {table.__tablename__}.")
+            logger.info(f"Successfully fetched Movie with id={id} from {table.__tablename__} for user ID {user_id}.")
         else:
-            logger.warning(f"No Movie found with id={id} in {table.__tablename__}.")
+            logger.warning(f"No Movie found with id={id} in {table.__tablename__} for user ID {user_id}.")
+            return None
+        
         return movie
     
     except SQLAlchemyError as db_error:
-        logger.error(f"Database error while fetching Movie with id={id} from {table.__tablename__}: {db_error}")
+        logger.error(f"Database error while fetching Movie with id={id} from {table.__tablename__} for user ID {user_id}: {db_error}")
         return None
     except Exception as error:
-        logger.error(f"Unexpected error while fetching Movie with id={id} from {table.__tablename__}: {error}")
+        logger.error(f"Unexpected error while fetching Movie with id={id} from {table.__tablename__} for user ID {user_id}: {error}")
         return None
+
     
 
 
-def Edit(movie, column_name, data):
+def Edit(movie, column_name, data, user_id):
     try:
+        # Check if the movie belongs to the current user
+        if movie.user_id != user_id:
+            logger.error(f"User ID {user_id} does not own Movie ID {movie.id}. Edit denied.")
+            return False
+        
         # Validate if the column exists on the movie object
         if not hasattr(movie, column_name):
             logger.error(f"Invalid column name '{column_name}' for Movie ID {movie.id}")
@@ -143,8 +213,13 @@ def Edit(movie, column_name, data):
 
 
 
-def Delete(movie_to_delt):
+def Delete(movie_to_delt, user_id):
     try:
+        # Check if the movie belongs to the current user
+        if movie.user_id != user_id:
+            logger.error(f"User ID {user_id} does not own Movie ID {movie.id}. Edit denied.")
+            return False
+        
         # Adjust rankings if the movie is in Top_10_Movies
         if isinstance(movie_to_delt, Top_10_Movies):
             movies_to_shift = Top_10_Movies.query.filter(

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Signup{% endblock %}
+
+{% block heading %}Signup{% endblock %}
+
+{% block paragraph %}Create an account and start adding movies to your collection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="POST" action="{{url_for('auth.signup')}}" novalidate class="needs-validation">
+    {{ form.hidden_tag() }}  
+    
+    <div class="form-group mb-3">
+        {{ form.name.label(class="fw-bold mb-1") }}
+        {{ form.name(class="form-control form-control-sm w-50") }}
+        {% for error in form.name.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group mb-3">
+        {{ form.email.label(class="fw-bold mb-1") }}
+        {{ form.email(class="form-control form-control-sm w-50") }}
+        {% for error in form.email.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group mb-3">
+        {{ form.password.label(class="fw-bold mb-1") }}
+        {{ form.password(class="form-control form-control-sm w-50") }}
+        {% for error in form.password.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>  
+
+    <div class="form-group mb-3">
+        {{ form.confirm_password.label(class="fw-bold mb-1") }}
+        {{ form.confirm_password(class="form-control form-control-sm w-50") }}
+        {% for error in form.confirm_password.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>  
+
+    {{ form.signup(class="btn btn-black mt-3") }}
+    </form>
+</div>
+{% endblock %}

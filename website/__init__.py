@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
@@ -30,11 +31,23 @@ def create_app(config_class='config.Config'):
 
     # Register blueprints
     from .views import views
+    from .auth import auth
     app.register_blueprint(views, url_prefix='/')
+    app.register_blueprint(auth, url_prefix='/')
 
     # Import models and create the database
-    from .models import Top_10_Movies, All_Movies
+    from .models import User, Top_10_Movies, All_Movies
     create_database(app)
+
+    # Configure Flask-Login
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login' # Redirect unauthorized (anonymous) users to the login page
+    login_manager.init_app(app)
+
+    # Load a user by their ID
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
 
     # Import socket event handlers to ensure they are registered
     with app.app_context():
