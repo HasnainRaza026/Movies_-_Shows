@@ -7,6 +7,8 @@ if __name__ == '__main__':
     from eventlet import wsgi
     wsgi.server(eventlet.listen(('127.0.0.1', 5000)), app)
 
+    # app.run(debug=True, host='127.0.0.1', port=5000)    # For Development and Testing
+
 
 
 '''

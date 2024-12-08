@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}My Favourite Movies{% endblock %}
+{% block title %}Movies Collection{% endblock %}
 
-{% block heading %}My Favourite Movies{% endblock %}
+{% block heading %}Movies Collection{% endblock %}
 
-{% block paragraph %}These are my all the movies I have ever watched.{% endblock %}
+{% block paragraph %}Your collection of Movies. Click Add Movie to add more movies.{% endblock %}
 
 {% block content %}
   {% if not top_10_movies and not all_movies %}
@@ -13,11 +13,11 @@
         <div class="col-md-12">
             <div class="error-template">
                 <h1>
-                    Empty!</h1>
+                  Collection Is Empty!</h1>
                 <h2>
                     Nothing to show</h2>
                 <div class="error-details">
-                    Click Add Movies to add your favourite movies
+                    Click Add Movies to add movies to your collection
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@
 }
  body {
 	 margin: 0;
-	 padding: 0;
+	 padding-top: 70px; /* Adjust based on navbar height */
 	 height: 100vh;
 	 background-color: #eaedfa;
 	 background-attachment: fixed;
