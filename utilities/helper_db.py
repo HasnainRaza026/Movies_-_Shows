@@ -64,22 +64,42 @@ def Get_User(email):
 
 #################################### MOVIES HELPER FUNCTIONS ##############################################
 
-def Add(form, data, user_id):
+def Add(form, data, id_user):
     try:
+        # Check if the movie_id already exists for the user in either table
+        movie_in_top_10 = Top_10_Movies.query.filter_by(user_id=id_user, movie_id=data.get("movie_id")).first()
+        movie_in_all = All_Movies.query.filter_by(user_id=id_user, movie_id=data.get("movie_id")).first()
+
+        if movie_in_top_10 or movie_in_all:
+            logger.warning(f"Movie with ID {data.get('movie_id')} already exists for user {id_user}.")
+            return "MOVIE_ALREADY_EXISTS"
+        
         if form.ranking.data:
             # Check if the Top_10_Movies table already has 10 entries
-            top_10_count = Top_10_Movies.query.count()
+            top_10_count = Top_10_Movies.query.filter_by(user_id=id_user).count()
+            # print(f'\n \n {top_10_count} \n \n')    #   For Debug
             if top_10_count >= 10:
                 logger.warning("Top_10_Movies table already has 10 entries. Cannot add more.")
                 return "TOP_10_FULL"
 
+            # Get the movies belonging to the user
+            user_movies = Top_10_Movies.query.filter_by(user_id=id_user).all()
+            # print(f'\n \n {user_movies} \n \n')  #   For Debug
+
             # Adjust rankings if necessary
-            existing_movie = Top_10_Movies.query.filter_by(rank=form.ranking.data).first()
+            existing_movie = next(
+                (movie for movie in user_movies if movie.rank == form.ranking.data), None
+            )
+            # print(f'\n \n {existing_movie} \n \n')  #   For Debug
+
             if existing_movie:
-                # Temporarily shift ranks to avoid UNIQUE constraint violations
-                movies_to_shift = Top_10_Movies.query.filter(
-                    Top_10_Movies.rank >= form.ranking.data
-                ).order_by(Top_10_Movies.rank.desc()).all()
+                # Get movies with rank >= the new rank, belonging to the same user
+                movies_to_shift = sorted(
+                    [movie for movie in user_movies if movie.rank >= form.ranking.data],
+                    key=lambda x: x.rank,
+                    reverse=True,
+                )
+                print(f'\n \n {movies_to_shift} \n \n')
 
                 # Temporarily increase ranks
                 for movie in movies_to_shift:
@@ -101,7 +121,7 @@ def Add(form, data, user_id):
                 review=form.review.data,
                 img_url=data.get("poster"),
                 movie_id=data.get("movie_id"),
-                user_id=user_id
+                user_id=id_user
             )
         else:
             # Adding to All_Movies table
@@ -112,7 +132,7 @@ def Add(form, data, user_id):
                 review=form.review.data,
                 img_url=data.get("poster"),
                 movie_id=data.get("movie_id"),
-                user_id=user_id
+                user_id=id_user
             )
 
         db.session.add(movie)
@@ -213,18 +233,19 @@ def Edit(movie, column_name, data, user_id):
 
 
 
-def Delete(movie_to_delt, user_id):
+def Delete(movie_to_delt, id_user):
     try:
         # Check if the movie belongs to the current user
-        if movie.user_id != user_id:
-            logger.error(f"User ID {user_id} does not own Movie ID {movie.id}. Edit denied.")
+        if movie_to_delt.user_id != id_user:
+            logger.error(f"User ID {id_user} does not own Movie ID {movie.id}. Edit denied.")
             return False
         
         # Adjust rankings if the movie is in Top_10_Movies
         if isinstance(movie_to_delt, Top_10_Movies):
             movies_to_shift = Top_10_Movies.query.filter(
-                Top_10_Movies.rank > movie_to_delt.rank
-            ).order_by(Top_10_Movies.rank.asc()).all()
+                                Top_10_Movies.rank > movie_to_delt.rank,
+                                Top_10_Movies.user_id == id_user
+                            ).order_by(Top_10_Movies.rank.asc()).all()
 
             for movie in movies_to_shift:
                 movie.rank += 10

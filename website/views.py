@@ -5,6 +5,8 @@ from utilities import helper_db, helper_api
 
 views = Blueprint('views', __name__)
 
+SAMPLE_POSTER = "https://www.shortlist.com/media/images/2019/05/the-30-coolest-alternative-movie-posters-ever-2-1556670563-K61a-column-width-inline.jpg"
+
 @views.route("/")
 @login_required
 def home():
@@ -31,14 +33,20 @@ def add():
             flash(data["error"], category="error")
             return render_template('add.html', form=add_form, user=current_user)
         
+        # Add movie poster does not exist, it adds a sample poster
+        if not data["poster"]:
+            data["poster"] = SAMPLE_POSTER
+
         # Add movie to the database
         data["movie_id"] = movie_id
-        status = helper_db.Add(form=add_form, data=data, user_id=current_user.id)
+        status = helper_db.Add(form=add_form, data=data, id_user=current_user.id)
         if status == "SUCCESS":
             flash("Movie added successfully!", category="success")
             return redirect(url_for('views.home'))
+        elif status == "MOVIE_ALREADY_EXISTS":
+            flash(f"Movie '{data.get('title')}' already exists.", category="error")
         elif status == "TOP_10_FULL":
-            flash("Cannot add more movies to the Top 10 list. It is already full.", category="warning")
+            flash("Cannot add more movies to the Top 10 list. It is already full.", category="error")
         else:
             flash("Internal Server Error in Adding Movie to the Database", category="error")
     
@@ -92,7 +100,7 @@ def delete(id):
         flash(message="Movie not found.", category="error")
         return redirect(url_for('views.home'))
     
-    status = helper_db.Delete(movie_to_delt=movie, user_id=current_user.id)
+    status = helper_db.Delete(movie_to_delt=movie, id_user=current_user.id)
     
     if not status:
         flash(message=f"Error deleting the movie '{movie.title}'.", category="error")
