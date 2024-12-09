@@ -69,7 +69,6 @@ def Add(form, data, id_user):
         # Check if the movie_id already exists for the user in either table
         movie_in_top_10 = Top_10_Movies.query.filter_by(user_id=id_user, movie_id=data.get("movie_id")).first()
         movie_in_all = All_Movies.query.filter_by(user_id=id_user, movie_id=data.get("movie_id")).first()
-
         if movie_in_top_10 or movie_in_all:
             logger.warning(f"Movie with ID {data.get('movie_id')} already exists for user {id_user}.")
             return "MOVIE_ALREADY_EXISTS"
@@ -99,13 +98,13 @@ def Add(form, data, id_user):
                     key=lambda x: x.rank,
                     reverse=True,
                 )
-                print(f'\n \n {movies_to_shift} \n \n')
+                # print(f'\n \n {movies_to_shift} \n \n')   #   For Debug
 
                 # Temporarily increase ranks
                 for movie in movies_to_shift:
                     movie.rank += 10
 
-                db.session.flush()  # Apply temporary shifts
+                db.session.flush()  # Temporary flush the database to highlight changes
 
                 # Adjust ranks to the correct positions
                 for movie in movies_to_shift:
@@ -173,52 +172,75 @@ def Get_All(user_id):
 
 
 
-def Get(id, user_id, table=Top_10_Movies):
+def Get(id, id_user, table=Top_10_Movies):
     try:
-        if user_id:
-            movie = table.query.filter_by(id=id, user_id=user_id).first()  # Fetch movie with user_id filter, to ensure movie belongs to a user
+        if id_user:
+            movie = table.query.filter_by(id=id, user_id=id_user).first()  # Fetch movie with user_id filter, to ensure movie belongs to a user
         else:
             return "UNAUTHORIZED"
         
         if movie:
-            logger.info(f"Successfully fetched Movie with id={id} from {table.__tablename__} for user ID {user_id}.")
+            logger.info(f"Successfully fetched Movie with id={id} from {table.__tablename__} for user ID {id_user}.")
         else:
-            logger.warning(f"No Movie found with id={id} in {table.__tablename__} for user ID {user_id}.")
+            logger.warning(f"No Movie found with id={id} in {table.__tablename__} for user ID {id_user}.")
             return None
         
         return movie
     
     except SQLAlchemyError as db_error:
-        logger.error(f"Database error while fetching Movie with id={id} from {table.__tablename__} for user ID {user_id}: {db_error}")
+        logger.error(f"Database error while fetching Movie with id={id} from {table.__tablename__} for user ID {id_user}: {db_error}")
         return None
     except Exception as error:
-        logger.error(f"Unexpected error while fetching Movie with id={id} from {table.__tablename__} for user ID {user_id}: {error}")
+        logger.error(f"Unexpected error while fetching Movie with id={id} from {table.__tablename__} for user ID {id_user}: {error}")
         return None
-
     
 
 
-def Edit(movie, column_name, data, user_id):
+def Edit(movie, column_name, data, id_user):
     try:
         # Check if the movie belongs to the current user
-        if movie.user_id != user_id:
-            logger.error(f"User ID {user_id} does not own Movie ID {movie.id}. Edit denied.")
+        if movie.user_id != id_user:
+            logger.error(f"User ID {id_user} does not own Movie ID {movie.id}. Edit denied.")
             return False
-        
+
         # Validate if the column exists on the movie object
         if not hasattr(movie, column_name):
             logger.error(f"Invalid column name '{column_name}' for Movie ID {movie.id}")
             return False
 
-        # Dynamically update the column
-        setattr(movie, column_name, data)
+        if column_name == "rank":
+            # print(f'\n \n {movie} | rank: {movie.rank} \n \n')  #   For Debug
+            # Check if the rank is already in use by another movie
+            conflicting_movie = Top_10_Movies.query.filter_by(user_id=id_user, rank=data).first()
+            # print(f'\n \n {conflicting_movie} | rank: {conflicting_movie.rank} \n \n')  #   For Debug
+            if conflicting_movie and conflicting_movie.id != movie.id:
+                # Temporarily set conflicting movie's rank to a placeholder
+                placeholder_rank = -1  # Ensure this value doesn't conflict
+                conflicting_movie.rank = placeholder_rank
 
-        db.session.flush()
+                db.session.flush()  # Flush the placeholder update to the database
+                # print(f'\n \n {conflicting_movie} | temp new rank: {conflicting_movie.rank} \n \n')  #   For Debug
+
+                conflicting_movie_new_rank = movie.rank
+                movie.rank = data   # Update the current movie's rank
+
+                db.session.flush() 
+                # print(f'\n \n {conflicting_movie} | temp new rank: {conflicting_movie.rank} \n \n')  #   For Debug
+
+                conflicting_movie.rank = conflicting_movie_new_rank # Restore the conflicting movie's rank
+
+            else:
+                movie.rank = data
+        else:
+            # Update the review or other fields
+            setattr(movie, column_name, data)
+
         db.session.commit()
+        # print(f'\n \n {conflicting_movie} | temp new rank: {conflicting_movie.rank} \n \n')  #   For Debug
 
         logger.info(f"Successfully updated Movie ID {movie.id}: Set [{column_name}] to '{data}'")
         return True
-    
+
     except SQLAlchemyError as db_error:
         logger.error(f"Database error while editing Movie ID {movie.id} ('{movie.title}'): {db_error}")
         db.session.rollback()

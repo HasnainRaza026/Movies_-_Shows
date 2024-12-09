@@ -58,7 +58,7 @@ def add():
 @login_required
 def edit(id):
     edit_form = EditMovie()
-    movie = helper_db.Get(id=id, user_id=current_user.id)
+    movie = helper_db.Get(id=id, id_user=current_user.id)
 
     if movie == "UNAUTHORIZED":
         flash(message="Please Login or Signup to Create Movie Collection.", category="error")
@@ -79,7 +79,7 @@ def edit(id):
         else:
             for field, value in inputs.items():
                 if value:
-                    status = helper_db.Edit(movie=movie, column_name=field, data=value, user_id=current_user.id)
+                    status = helper_db.Edit(movie=movie, column_name=field, data=value, id_user=current_user.id)
                     if not status:
                         flash(message=f"Error updating '{field}' for movie '{movie.title}'.", category="error")
                         return render_template('edit.html', form=edit_form, movie=movie, user=current_user)
