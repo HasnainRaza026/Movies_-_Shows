@@ -172,26 +172,29 @@ def Get_All(user_id):
 
 
 
-def Get(id, id_user, table=Top_10_Movies):
+def Get(id, id_user, table):
     try:
         if id_user:
-            movie = table.query.filter_by(id=id, user_id=id_user).first()  # Fetch movie with user_id filter, to ensure movie belongs to a user
+            if table == "top_10_movies":
+                movie = Top_10_Movies.query.filter_by(id=id, user_id=id_user).first()  # Fetch movie with user_id filter, to ensure movie belongs to a user
+            else:
+                movie = All_Movies.query.filter_by(id=id, user_id=id_user).first()
         else:
             return "UNAUTHORIZED"
         
         if movie:
-            logger.info(f"Successfully fetched Movie with id={id} from {table.__tablename__} for user ID {id_user}.")
+            logger.info(f"Successfully fetched Movie with id={id} from {table} for user ID {id_user}.")
         else:
-            logger.warning(f"No Movie found with id={id} in {table.__tablename__} for user ID {id_user}.")
+            logger.warning(f"No Movie found with id={id} in {table} for user ID {id_user}.")
             return None
         
         return movie
     
     except SQLAlchemyError as db_error:
-        logger.error(f"Database error while fetching Movie with id={id} from {table.__tablename__} for user ID {id_user}: {db_error}")
+        logger.error(f"Database error while fetching Movie with id={id} from {table} for user ID {id_user}: {db_error}")
         return None
     except Exception as error:
-        logger.error(f"Unexpected error while fetching Movie with id={id} from {table.__tablename__} for user ID {id_user}: {error}")
+        logger.error(f"Unexpected error while fetching Movie with id={id} from {table} for user ID {id_user}: {error}")
         return None
     
 
@@ -278,6 +281,8 @@ def Delete(movie_to_delt, id_user):
 
             for movie in movies_to_shift:
                 movie.rank -= 11
+        else:
+            db.session.delete(movie_to_delt)
 
         db.session.flush()
         db.session.commit()

@@ -91,10 +91,10 @@ def edit(id):
 
 
 
-@views.route("/delete/<int:id>")
+@views.route("/delete/<int:id>/<string:table>")
 @login_required
-def delete(id):
-    movie = helper_db.Get(id=id, user_id=current_user.id)
+def delete(id, table):
+    movie = helper_db.Get(id=id, table=table, id_user=current_user.id)
 
     if not movie:
         flash(message="Movie not found.", category="error")

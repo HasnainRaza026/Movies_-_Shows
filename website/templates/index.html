@@ -43,7 +43,7 @@
             {{movie["description"]}}
           </p>
           <a href="{{url_for('views.edit', id=movie['id'])}}" class="button">Update</a>
-          <a href="{{url_for('views.delete', id=movie['id'])}}" class="button delete-button">Remove</a>
+          <a href="{{url_for('views.delete', id=movie['id'], table='top_10_movies')}}" class="button delete-button">Remove</a>
         </div>
       </div>
     </div>
@@ -63,6 +63,7 @@
                         <i class="fas fa-star star"></i>
                     </div>
                     <p class="review">"{{movie["review"]}}"</p>
+                    <a href="{{url_for('views.delete', id=movie['id'], table='all_movies')}}" class="btn btn-sm btn-rounded btn-danger">Remove</a>
                 </div>
             </div>
         </div>
