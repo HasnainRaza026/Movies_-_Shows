@@ -175,7 +175,7 @@ def Get_All(user_id):
 def Get(id, id_user, table):
     try:
         if id_user:
-            if table == "top_10_movies":
+            if table == "top_10_movies" or table == "EDIT":
                 movie = Top_10_Movies.query.filter_by(id=id, user_id=id_user).first()  # Fetch movie with user_id filter, to ensure movie belongs to a user
             else:
                 movie = All_Movies.query.filter_by(id=id, user_id=id_user).first()

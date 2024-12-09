@@ -42,7 +42,7 @@
           <p class="overview">
             {{movie["description"]}}
           </p>
-          <a href="{{url_for('views.edit', id=movie['id'])}}" class="button">Update</a>
+          <a href="{{url_for('views.edit', id=movie['id'], table='top_10_movies')}}" class="button">Update</a>
           <a href="{{url_for('views.delete', id=movie['id'], table='top_10_movies')}}" class="button delete-button">Remove</a>
         </div>
       </div>

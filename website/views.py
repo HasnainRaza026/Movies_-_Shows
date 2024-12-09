@@ -58,7 +58,7 @@ def add():
 @login_required
 def edit(id):
     edit_form = EditMovie()
-    movie = helper_db.Get(id=id, id_user=current_user.id)
+    movie = helper_db.Get(id=id, table="EDIT", id_user=current_user.id)
 
     if movie == "UNAUTHORIZED":
         flash(message="Please Login or Signup to Create Movie Collection.", category="error")
