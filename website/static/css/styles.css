@@ -146,13 +146,16 @@
 	 font-weight: bold;
 	 color: #fff;
 	 padding: 0.5em 1em;
-	 border-radius: 100px;
+	 border-radius: 500px;
 	 font: inherit;
 	 background: linear-gradient(135deg, #1a9be6, #1a57e6);
 	 border: none;
 	 position: relative;
 	 transform-style: preserve-3d;
 	 transition: 300ms ease;
+}
+.button.b-size{
+	padding: 1em 1.5em;
 }
  .button:before {
 	 transition: 300ms ease;

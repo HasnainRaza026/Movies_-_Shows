@@ -25,7 +25,7 @@
   </div>
 
   {% else %}
-  <div class="container">
+  <div class="container pb-3">
     {% for movie in top_10_movies %}
     <div class="card card-top-10" >
       <div class="front" style="background-image: url('{{movie['img_url']}}');">
@@ -50,7 +50,7 @@
     {% endfor %}
   </div>
   
-  <div class="container text-center">
+  <div class="container text-center mt-5">
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
         {% for movie in all_movies %}
         <div class="col">
@@ -70,10 +70,14 @@
         {% endfor %}
     </div>
   </div>
+
+  <div class="container text-center add custom-css-add-botton">
+    <a href="{{url_for('views.add')}}" class="button b-size">Add Movies</a>
+  </div>
  
   {% endif %}
 
-  <div class="container text-center add custom-css-add-botton">
+  <!-- <div class="container text-center add custom-css-add-botton">
     <a href="{{url_for('views.add')}}" class="button">Add Content</a>
-  </div>
+  </div> -->
 {% endblock %}
