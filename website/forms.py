@@ -40,7 +40,7 @@ class Login(FlaskForm):
 
 class AddMovie(FlaskForm):
     title = StringField('Type movie name', validators=[DataRequired(message="Movie Title is required."), Length(max=120)])
-    review = StringField('Give one sentence review', validators=[DataRequired(message="Review is required."), Length(max=20)])
+    review = StringField('Give one sentence review', validators=[DataRequired(message="Review is required."), Length(max=40)])
     ranking = IntegerField('Add your ranking 1-10 (Optional)', validators=[Optional(), NumberRange(min=1, max=10)])
     add = SubmitField('Add')
 

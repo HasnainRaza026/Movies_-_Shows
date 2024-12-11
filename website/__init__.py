@@ -32,8 +32,10 @@ def create_app(config_class='config.Config'):
     # Register blueprints
     from .views import views
     from .auth import auth
+    from .error import error
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(error, url_prefix='/')
 
     # Import models and create the database
     from .models import User, Top_10_Movies, All_Movies

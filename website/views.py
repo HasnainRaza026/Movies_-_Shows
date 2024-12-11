@@ -11,11 +11,10 @@ SAMPLE_POSTER = "https://www.shortlist.com/media/images/2019/05/the-30-coolest-a
 @login_required
 def home():
     data = helper_db.Get_All(user_id=current_user.id)
-    if not data[0] and not data[1]:  # Check if both lists have data
-        flash("No movies available. Please try again later.", category="warning")
-        return render_template("error.html", user=current_user)
-
     return render_template("index.html", top_10_movies=data[0], all_movies=data[1], user=current_user)
+    
+    # # Force an error to test the error handler
+    # raise Exception("This is a test error!")    # For Testing and Debug only
 
 
 

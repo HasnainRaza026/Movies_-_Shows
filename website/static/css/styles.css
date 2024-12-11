@@ -261,6 +261,10 @@
 	background-color: #f0f0f0;
 	cursor: pointer;
 }
+
+.custom-nav:hover {
+	text-decoration: underline;
+}
   
 .error-template {padding: 40px 15px;text-align: center;}
 .error-actions {margin-top:15px;margin-bottom:15px;}

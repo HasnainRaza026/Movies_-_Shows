@@ -19,6 +19,9 @@
                 <div class="error-details">
                     Click Add Movies to add movies to your collection
                 </div>
+                <div class="container text-center add mt-5">
+                  <a href="{{url_for('views.add')}}" class="button b-size">Add Movie</a>
+                </div>
             </div>
         </div>
     </div>
@@ -50,7 +53,7 @@
     {% endfor %}
   </div>
   
-  <div class="container text-center mt-5">
+  <div class="container text-center mt-5 pb-3">
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
         {% for movie in all_movies %}
         <div class="col">
@@ -63,7 +66,7 @@
                         <i class="fas fa-star star"></i>
                     </div>
                     <p class="review">"{{movie["review"]}}"</p>
-                    <a href="{{url_for('views.delete', id=movie['id'], table='all_movies')}}" class="btn btn-sm btn-rounded btn-danger">Remove</a>
+                    <a href="{{url_for('views.delete', id=movie['id'], table='all_movies')}}" class="btn btn-sm btn-rounded btn-danger mb-2">Remove</a>
                 </div>
             </div>
         </div>
@@ -72,12 +75,9 @@
   </div>
 
   <div class="container text-center add custom-css-add-botton">
-    <a href="{{url_for('views.add')}}" class="button b-size">Add Movies</a>
+    <a href="{{url_for('views.add')}}" class="button b-size">Add Movie</a>
   </div>
  
   {% endif %}
 
-  <!-- <div class="container text-center add custom-css-add-botton">
-    <a href="{{url_for('views.add')}}" class="button">Add Content</a>
-  </div> -->
 {% endblock %}
