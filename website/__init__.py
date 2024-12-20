@@ -7,7 +7,7 @@ from flask_socketio import SocketIO
 from utilities.logger import logger
 
 db = SQLAlchemy()
-socketio = SocketIO(cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins=["https://mywatchlist.onrender.com", "http://127.0.0.1:5000"], async_mode="eventlet")
 DB_NAME = "movies_and_shows.db"
 
 # Loading API key with fallback
