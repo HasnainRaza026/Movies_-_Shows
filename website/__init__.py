@@ -7,7 +7,7 @@ from flask_socketio import SocketIO
 from utilities.logger import logger
 
 db = SQLAlchemy()
-socketio = SocketIO(cors_allowed_origins=["https://mywatchlist.onrender.com", "http://127.0.0.1:5000"], async_mode="eventlet")
+socketio = SocketIO(cors_allowed_origins=["https://mywatchlist-vsr7.onrender.com", "http://127.0.0.1:5000"], async_mode="eventlet")
 DB_NAME = "movies_and_shows.db"
 
 # Loading API key with fallback
@@ -63,9 +63,11 @@ def create_app(config_class='config.Config'):
 def create_database(app):
     """Create the database and tables if they don't already exist."""
     try:
-        with app.app_context():
-            db.create_all()
-            logger.info("Database initialized (tables created if not present).")
+        db_path = '/tmp/movies_and_shows.db'
+        if not os.path.exists(db_path):
+            with app.app_context():
+                db.create_all()
+                logger.info("Database initialized (tables created if not present).")
     except Exception as error:
         logger.error(f"Failed to initialize the database: {error}")
         raise
