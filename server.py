@@ -4,12 +4,15 @@ from website import create_app
 app = create_app()
 
 if __name__ == '__main__':
-    # # For Production and Testing
-    # app.run(debug=True, host='127.0.0.1', port=5000)
+    # For Development and Testing
+    import eventlet
+    from eventlet import wsgi
+    wsgi.server(eventlet.listen(('127.0.0.1', 5000)), app)
+
 
     # For Deployment on Render
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    # port = int(os.environ.get("PORT", 5000))
+    # app.run(host='0.0.0.0', port=port)
 
 
 
